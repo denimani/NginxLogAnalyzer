@@ -1,0 +1,6 @@
+psycopg2-binary
+django
+djangorestframework
+python-dotenv
+django-filter
+drf-yasg
