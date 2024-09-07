@@ -22,11 +22,12 @@ class Command(BaseCommand):
         file_path = os.path.join(settings.BASE_DIR, log_file)
 
         try:
+            log_entries = []
             # открываем файл и читаем построчно параллельно сохраняем в БД
             with open(file_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     log_entry = json.loads(line)
-                    log = LogEntry(
+                    log_entries.append(LogEntry(
                         time=datetime.strptime(log_entry['time'], "%d/%b/%Y:%H:%M:%S %z"),
                         remote_ip=log_entry['remote_ip'],
                         remote_user=log_entry['remote_user'],
@@ -36,8 +37,9 @@ class Command(BaseCommand):
                         bytes=log_entry['bytes'],
                         referrer=log_entry['referrer'],
                         agent=log_entry['agent'],
-                    )
-                    log.save()
+                    ))
+
+            LogEntry.objects.bulk_create(log_entries)
 
         # если файл не существует - выводим ошибку
         except FileNotFoundError:
